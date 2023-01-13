@@ -9,15 +9,18 @@ const Game = () => {
     const [computerChoice, setComputerChoice] = useState(null);
     const [result, setResult] = useState(null);
     const [countdown, setCountdown] = useState(0);
+    const [isDisabled, setIsDisabled] = useState(false);
 
 
     useEffect(() => {
         let intervalId = null;
         if (countdown > 0) {
+            setIsDisabled(true);
             intervalId = setInterval(() => {
             setCountdown((prevCountdown) => prevCountdown - 1);
             }, 1000);
         } else if (countdown === 0) {
+            setIsDisabled(false);
             resetGame();
         }
         return () => clearInterval(intervalId);
@@ -31,16 +34,17 @@ const Game = () => {
         setComputerChoice(choices[randomIndex]);
 
         if (choice === computerChoice) {
-        setResult('Empate');
+            setResult('Empate');
         } else if (
         (choice === 'piedra' && computerChoice === 'tijeras') ||
         (choice === 'papel' && computerChoice === 'piedra') ||
         (choice === 'tijeras' && computerChoice === 'papel')
         ) {
-        setResult('Ganaste');
+            setResult('Ganaste');
         } else {
-        setResult('Perdiste');
+            setResult('Perdiste');
         }
+        setIsDisabled(false);
     }
 
    function resetGame(){
@@ -54,7 +58,7 @@ const Game = () => {
         <h1>Piedra, Papel o Tijeras</h1>
         <div>
           {choices.map((choice) => (
-            <button key={choice} onClick={() => handleChoice(choice)}>
+            <button key={choice} onClick={() => handleChoice(choice)} disabled={isDisabled}>
               {choice}
             </button>
           ))}
