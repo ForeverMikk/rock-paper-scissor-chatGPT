@@ -1,1 +1,1 @@
-# rock-paper-scissor-chatGPT
+# Rock Paper Scissor with ChatGPT
