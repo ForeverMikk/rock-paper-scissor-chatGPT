@@ -27,6 +27,12 @@ const Game = () => {
         }
     }
 
+    function resetGame() {
+        setPlayerChoice(null);
+        setComputerChoice(null);
+        setResult(null);
+      }
+
     return (
         <div>
         <h1>Piedra, Papel o Tijeras</h1>
@@ -41,6 +47,7 @@ const Game = () => {
           <p>Tu elección: {playerChoice}</p>
           <p>Elección de la computadora: {computerChoice}</p>
           <p>Resultado: {result}</p>
+          <button onClick={resetGame}>Reiniciar juego</button>
         </div>
       </div>
     )
