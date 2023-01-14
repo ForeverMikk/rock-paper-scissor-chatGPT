@@ -2,113 +2,123 @@ import React, { useState, useEffect } from 'react';
 
 const choices = ['piedra', 'papel', 'tijeras'];
 
-
 const Game = () => {
+  const [playerChoice, setPlayerChoice] = useState(null);
+  const [computerChoice, setComputerChoice] = useState(null);
+  const [result, setResult] = useState(null);
+  const [countdown, setCountdown] = useState(3);
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [playAgainst, setPlayAgainst] = useState('computer');
 
-    const [playerChoice, setPlayerChoice] = useState(null);
-    const [computerChoice, setComputerChoice] = useState(null);
-    const [result, setResult] = useState(null);
-    const [countdown, setCountdown] = useState(0);
-    const [isDisabled, setIsDisabled] = useState(false);
-    const [playAgainst, setPlayAgainst] = useState('computer');
+  useEffect(() => {
+    let intervalId = null;
+    if (countdown > 0) {
+      setIsDisabled(true);
+      intervalId = setInterval(() => {
+        setCountdown((prevCountdown) => prevCountdown - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      resetGame();
+    }
+    return () => clearInterval(intervalId);
+  }, [countdown]);
 
-
-    useEffect(() => {
-        let intervalId = null;
-        if (countdown > 0) {
-            setIsDisabled(true);
-            intervalId = setInterval(() => {
-            setCountdown((prevCountdown) => prevCountdown - 1);
-            }, 1000);
-        } else if (countdown === 0) {
-            setIsDisabled(false);
-            resetGame();
-        }
-        return () => clearInterval(intervalId);
-    }, [countdown, resetGame]);
-
-
-    function handleChoice(choice) {
-      if (playAgainst === 'computer') {
-        setCountdown(3);
-        setPlayerChoice(choice);
-        const randomIndex = Math.floor(Math.random() * choices.length);
-        setComputerChoice(choices[randomIndex]);
-
-        if (choice === computerChoice) {
-            setResult('Empate');
-        } else if (
+  const handleChoice = (choice) => {
+    if (playAgainst === 'computer') {
+      setPlayerChoice(choice);
+      const randomIndex = Math.floor(Math.random() * choices.length);
+      setComputerChoice(choices[randomIndex]);
+      if (choice === computerChoice) {
+        setResult('Empate');
+      } else if (
         (choice === 'piedra' && computerChoice === 'tijeras') ||
         (choice === 'papel' && computerChoice === 'piedra') ||
         (choice === 'tijeras' && computerChoice === 'papel')
-        ) {
-            setResult('Ganaste');
-        } else {
-            setResult('Perdiste');
-        }
+      ) {
+        setResult('Ganaste');
       } else {
-          setPlayerChoice(choice);
-          setComputerChoice(null);
-          setResult('Esperando a otro jugador...');
-          }
-          
-        setIsDisabled(false);
+        setResult('Perdiste');
+      }
+    } else {
+      setPlayerChoice(choice);
+      setResult('Esperando elección del otro jugador');
     }
+    setIsDisabled(false);
+    setCountdown(3);
+  }
 
-    function handlePlayAgainst(option) {
-      setPlayAgainst(option);
-      resetGame();
+  const handleOpponentChoice = (choice) => {
+    if (playAgainst === 'person') {
+      setComputerChoice(choice);
+      if (playerChoice === choice) {
+        setResult('Empate');
+      } else if (
+        (playerChoice === 'piedra' && choice === 'tijeras') ||
+        (playerChoice === 'papel' && choice === 'piedra') ||
+        (playerChoice === 'tijeras' && choice === 'papel')
+      ) {
+        setResult('Ganaste');
+      } else {
+        setResult('Perdiste');
       }
+    }
+  }
 
-   function resetGame(){
-        setPlayerChoice(null);
-        setComputerChoice(null);
-        setResult(null);
-        setIsDisabled(false);
-      }
+  const resetGame = () => {
+    setPlayerChoice(null);
+    setComputerChoice(null);
+    setResult(null);
+  }
 
-    return (
+  return (
+    <div>
+      <h1>Piedra, Papel o Tijeras</h1>
+      <div>
+        <label>
+          <input
+            type="radio"
+            name="playAgainst"
+            value="computer"
+            checked={playAgainst === 'computer'}
+            onChange={(e) => setPlayAgainst(e.target.value)}
+          />
+          Jugar contra la computadora
+        </label>
+        <label>
+          <input
+            type="radio"
+            name="playAgainst"
+            value="person"
+            checked={playAgainst === 'person'}
+            onChange={(e) => setPlayAgainst(e.target.value)}
+          />
+          Jugar contra otra persona
+        </label>
+      </div>
+      <div>
+        {choices.map((choice) => (
+          <button key={choice} onClick={() => handleChoice(choice)} disabled={isDisabled}>
+            {choice}
+          </button>
+        ))}
+      </div>
+      {playAgainst === 'person' && (
         <div>
-        <h1>Piedra, Papel o Tijeras</h1>
-        <div>
-<label>
-<input
-type="radio"
-name="playAgainst"
-value="computer"
-checked={playAgainst === 'computer'}
-onChange={() => handlePlayAgainst('computer')}
-/>
-Jugar contra la computadora
-</label>
-<label>
-<input
-type="radio"
-name="playAgainst"
-value="player"
-checked={playAgainst === 'player'}
-onChange={() => handlePlayAgainst('player')}
-/>
-Jugar contra otra persona
-</label>
-</div>
-
-        <div>
+          <p>Elección del otro jugador:</p>
           {choices.map((choice) => (
-            <button key={choice} onClick={() => handleChoice(choice)} disabled={isDisabled}>
+            <button key={choice} onClick={() => handleOpponentChoice(choice)}>
               {choice}
             </button>
           ))}
         </div>
+      )}
+      <div><p>Tu elección: {playerChoice}</p>
+        <p>Elección de la computadora: {computerChoice}</p>
+        <p>Resultado: {result}</p>
         <p>{countdown > 0 ? countdown : ''}</p>
-        <div>
-          <p>Tu elección: {playerChoice}</p>
-          <p>Elección de la computadora: {computerChoice}</p>
-          <p>Resultado: {result}</p>
-          <button onClick={resetGame}>Reiniciar juego</button>
-        </div>
       </div>
-    )
+    </div>
+  );
 }
 
 export default Game;
