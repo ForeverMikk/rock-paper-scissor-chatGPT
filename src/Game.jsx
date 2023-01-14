@@ -10,6 +10,7 @@ const Game = () => {
     const [result, setResult] = useState(null);
     const [countdown, setCountdown] = useState(0);
     const [isDisabled, setIsDisabled] = useState(false);
+    const [playAgainst, setPlayAgainst] = useState('computer');
 
 
     useEffect(() => {
@@ -28,6 +29,7 @@ const Game = () => {
 
 
     function handleChoice(choice) {
+      if (playAgainst === 'computer') {
         setCountdown(3);
         setPlayerChoice(choice);
         const randomIndex = Math.floor(Math.random() * choices.length);
@@ -44,18 +46,53 @@ const Game = () => {
         } else {
             setResult('Perdiste');
         }
+      } else {
+          setPlayerChoice(choice);
+          setComputerChoice(null);
+          setResult('Esperando a otro jugador...');
+          }
+          
         setIsDisabled(false);
     }
+
+    function handlePlayAgainst(option) {
+      setPlayAgainst(option);
+      resetGame();
+      }
 
    function resetGame(){
         setPlayerChoice(null);
         setComputerChoice(null);
         setResult(null);
+        setIsDisabled(false);
       }
 
     return (
         <div>
         <h1>Piedra, Papel o Tijeras</h1>
+        <div>
+<label>
+<input
+type="radio"
+name="playAgainst"
+value="computer"
+checked={playAgainst === 'computer'}
+onChange={() => handlePlayAgainst('computer')}
+/>
+Jugar contra la computadora
+</label>
+<label>
+<input
+type="radio"
+name="playAgainst"
+value="player"
+checked={playAgainst === 'player'}
+onChange={() => handlePlayAgainst('player')}
+/>
+Jugar contra otra persona
+</label>
+</div>
+
         <div>
           {choices.map((choice) => (
             <button key={choice} onClick={() => handleChoice(choice)} disabled={isDisabled}>
